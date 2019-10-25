@@ -1,0 +1,24 @@
+version: 2.1
+orbs:
+  gcp-cli: circleci/gcp-cli@1.8.2
+jobs:
+  mvn-push:
+    docker:
+      - image: circleci/openjdk:11.0.2
+    steps:
+      - gcp-cli/install
+      - gcp-cli/initialize
+      - run: |
+          mkdir -p "$HOME/.docker"
+          gcloud auth configure-docker
+      - checkout
+      - run:
+          name: "Set up build tag"
+          command: |
+            echo 'export BUILD_TAG=`git rev-parse --short HEAD`' >> $BASH_ENV
+      - run: chmod +x ./mvnw && ./mvnw compile com.google.cloud.tools:jib-maven-plugin:1.6.1:build -Dimage=gcr.io/verily-cloud-l5x0-admin/services/hello-service:${BUILD_TAG}
+workflows:
+  build-and-push:
+    jobs:
+      - mvn-push:
+          context: verilycloud-poc-sa

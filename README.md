@@ -1,2 +1,3 @@
-# verily-cloud-hello-service-service
-Service repo for hello-service
+# spring-boot-grpc-template
+
+Getting Started code template for Spring Boot
